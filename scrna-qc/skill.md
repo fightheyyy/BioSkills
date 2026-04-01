@@ -57,7 +57,27 @@ Rscript filter-qc.R \
 ## 输出
 
 - `sample_rds/`: 过滤后的RDS文件
-- `qc_plots/`: 质控图（小提琴图、散点图）
+- `0.QC/`: 质控图和统计表
+  - `nFeature_raw.png`, `nCount_raw.png`, `mt_raw.png`: 过滤前的小提琴图
+  - `nFeature_filter.png`, `nCount_filter.png`, `mt_filter.png`: 过滤后的小提琴图
+  - `QC_summary.txt`: QC统计表（包含过滤前后细胞数和阈值）
+
+## 常见需求
+
+**需求6**: 设置新的过滤条件
+```bash
+--min_features 500 --max_features 8000 --max_mt 10
+```
+
+**需求7**: 每个样本的QC指标可视化
+- 脚本已自动生成三个指标的小提琴图（无散点）
+
+**需求12**: QC统计表
+- 自动生成 `0.QC/QC_summary.txt`，包含：
+  - 样本名称
+  - 过滤前细胞数
+  - 过滤后细胞数
+  - 过滤阈值（min/max features, max MT）
 
 ## 依赖
 

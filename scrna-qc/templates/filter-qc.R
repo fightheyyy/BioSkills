@@ -74,11 +74,19 @@ nCount_plots <- list()
 mt_plots <- list()
 
 for(i in 1:length(sample_list)){
-  print(paste0(sample_names[i], " raw cell number:"))
-  print(ncol(sample_list[[i]]))
+  cells_before <- ncol(sample_list[[i]])
   sample_list[[i]] <- subset(sample_list[[i]], subset=nFeature_RNA>min_features & nFeature_RNA<max_features & percent.mt<max_mt)
-  print(paste0(sample_names[i], " filter cell number:"))
-  print(ncol(sample_list[[i]]))
+  cells_after <- ncol(sample_list[[i]])
+
+  qc_stats <- rbind(qc_stats, data.frame(
+    Sample=sample_names[i],
+    Cells_Before=cells_before,
+    Cells_After=cells_after,
+    Min_Features=min_features,
+    Max_Features=max_features,
+    Max_MT=max_mt
+  ))
+
   saveRDS(sample_list[[i]], file=paste0(outdir,'/sample_rds/',sample_names[i],'.rds'))
   nFeature_plots[[i]] <- VlnPlot(sample_list[[i]], features='nFeature_RNA', pt.size=0)
   nCount_plots[[i]] <- VlnPlot(sample_list[[i]], features='nCount_RNA', pt.size=0)
@@ -91,3 +99,7 @@ plot_mt <- wrap_plots(mt_plots, ncol=3)
 ggsave(plot_nFeature, filename=paste0(outdir,'/0.QC/nFeature_filter.png'), width=20, height=15)
 ggsave(plot_nCount, filename=paste0(outdir,'/0.QC/nCount_filter.png'), width=20, height=15)
 ggsave(plot_mt, filename=paste0(outdir,'/0.QC/mt_filter.png'), width=20, height=15)
+
+# 保存QC统计表
+write.table(qc_stats, file=paste0(outdir,'/0.QC/QC_summary.txt'), sep="\t", quote=F, row.names=F, col.names=T)
+cat("QC完成！统计表已保存至 0.QC/QC_summary.txt\n")
